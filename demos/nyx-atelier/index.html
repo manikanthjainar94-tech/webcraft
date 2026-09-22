@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="NYX Atelier — an immersive creative technology concept by WebCraft Studio.">
+<title>NYX — Enter Another Dimension</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- GSAP + ScrollTrigger + Lenis + Three.js -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.8/dist/lenis.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js"></script>
+
+<style>
+:root{
+  --bg:#050505;
+  --paper:#f2f0ea;
+  --ink:#0b0b0b;
+  --muted:#888883;
+  --acid:#d9ff45;
+  --violet:#8d6cff;
+  --cyan:#6ee7ff;
+  --line:rgba(255,255,255,.13);
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);scroll-behavior:auto}
+body{
+  background:var(--bg);color:#fff;font-family:"DM Sans",sans-serif;
+  overflow-x:hidden;cursor:none;
+}
+body.loading{overflow:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+::selection{background:var(--acid);color:#050505}
+
+#webgl{
+  position:fixed;inset:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;
+}
+.vignette{
+  position:fixed;inset:0;z-index:3;pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 45%,transparent 25%,rgba(0,0,0,.18) 70%,rgba(0,0,0,.72) 100%);
+}
+.grain{
+  position:fixed;inset:-50%;z-index:20;pointer-events:none;opacity:.045;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+  animation:grain .18s steps(2) infinite;
+}
+@keyframes grain{
+  0%{transform:translate(0,0)}25%{transform:translate(2%,1%)}50%{transform:translate(-1%,2%)}75%{transform:translate(1%,-1%)}100%{transform:translate(0,0)}
+}
+
+/* LOADER */
+.loader{
+  position:fixed;inset:0;z-index:999;
+  background:#050505;display:grid;place-items:center;
+  transition:opacity 1s var(--ease),visibility 1s;
+}
+.loader.done{opacity:0;visibility:hidden;pointer-events:none}
+.loader-inner{width:min(440px,75vw)}
+.loader-top{display:flex;justify-content:space-between;color:#777;font:12px "DM Mono";letter-spacing:.16em;text-transform:uppercase}
+.loader-word{
+  font-family:"Space Grotesk";font-size:clamp(55px,11vw,125px);
+  letter-spacing:-.08em;line-height:.8;margin:35px 0;
+}
+.loader-track{height:1px;background:#222;overflow:hidden}
+.loader-track span{display:block;width:0;height:100%;background:var(--acid)}
+.loader-percent{font:13px "DM Mono";margin-top:13px;color:#999}
+
+/* CURSOR */
+.cursor-dot,.cursor{
+  position:fixed;left:0;top:0;pointer-events:none;z-index:1000;
+  transform:translate(-50%,-50%);
+}
+.cursor-dot{width:5px;height:5px;border-radius:50%;background:var(--acid)}
+.cursor{
+  width:44px;height:44px;border:1px solid rgba(255,255,255,.6);border-radius:50%;
+  transition:width .35s var(--ease),height .35s var(--ease),background .35s,border .35s;
+}
+body.hovering .cursor{
+  width:78px;height:78px;background:var(--acid);border-color:var(--acid);
+  mix-blend-mode:difference;
+}
+
+/* HEADER */
+.header{
+  position:fixed;top:0;left:0;width:100%;z-index:100;
+  padding:25px 4vw;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+  font:13px "DM Mono";letter-spacing:.14em;text-transform:uppercase;
+}
+.logo{justify-self:start;font:600 15px "Space Grotesk";letter-spacing:-.02em}
+.logo span{color:var(--acid)}
+.header-center{display:flex;gap:30px;color:#aaa}
+.header-right{justify-self:end;display:flex;align-items:center;gap:18px}
+.status{display:flex;align-items:center;gap:8px;color:#aaa}
+.status i{width:6px;height:6px;border-radius:50%;background:var(--acid);box-shadow:0 0 12px var(--acid);animation:pulse 1.8s infinite}
+@keyframes pulse{50%{opacity:.35;transform:scale(.6)}}
+.menu-btn{border:1px solid #555;background:transparent;color:#fff;padding:9px 12px;cursor:none}
+
+/* HERO */
+.hero{
+  position:relative;z-index:5;min-height:180vh;
+}
+.hero-sticky{
+  position:sticky;top:0;height:100svh;overflow:hidden;
+  display:flex;align-items:center;
+}
+.hero-ui{
+  position:absolute;z-index:5;inset:0;pointer-events:none;
+  padding:0 4vw;display:flex;align-items:center;justify-content:space-between;
+}
+.hero-side{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  color:#777;font:12px "DM Mono";letter-spacing:.22em;text-transform:uppercase;
+}
+.hero-copy{
+  position:absolute;z-index:6;left:8vw;top:50%;transform:translateY(-50%);
+  width:min(680px,72vw);pointer-events:none;
+}
+.hero-kicker{font:13px "DM Mono";color:var(--acid);letter-spacing:.24em;text-transform:uppercase;margin-bottom:22px}
+.hero-title{
+  font-family:"Space Grotesk";font-size:clamp(75px,12vw,190px);font-weight:500;
+  line-height:.77;letter-spacing:-.085em;
+}
+.hero-title .line{display:block;overflow:hidden}
+.hero-title em{font-style:normal;color:var(--acid)}
+.hero-sub{
+  margin-top:35px;max-width:420px;color:#999;line-height:1.7;font-size:15px;
+}
+.hero-scroll{
+  position:absolute;bottom:5vh;left:8vw;z-index:7;font:12px "DM Mono";letter-spacing:.2em;color:#888;text-transform:uppercase;
+  display:flex;align-items:center;gap:13px;
+}
+.hero-scroll span{height:45px;width:1px;background:linear-gradient(#888,transparent);display:block}
+.hero-orbit-label{
+  position:absolute;right:7vw;bottom:8vh;z-index:7;font:12px "DM Mono";color:#777;letter-spacing:.16em;text-transform:uppercase;
+}
+
+/* DATA HUD */
+.hud{
+  position:absolute;right:4vw;top:50%;z-index:8;transform:translateY(-50%);
+  width:165px;font:11px "DM Mono";color:#777;letter-spacing:.08em;text-transform:uppercase;
+}
+.hud-row{display:flex;justify-content:space-between;border-bottom:1px solid #222;padding:9px 0}
+.hud-row b{font-weight:400;color:#ddd}
+
+/* SECTIONS */
+.section{
+  position:relative;z-index:6;background:var(--paper);color:var(--ink);
+  padding:150px 7vw;
+}
+.section.dark{background:#070707;color:#fff}
+.section-inner{max-width:1450px;margin:auto}
+.eyebrow{font:13px "DM Mono";letter-spacing:.22em;color:#777;text-transform:uppercase;margin-bottom:28px}
+.dark .eyebrow{color:#777}
+.big-title{
+  font-family:"Space Grotesk";font-size:clamp(52px,9vw,145px);font-weight:500;
+  letter-spacing:-.075em;line-height:.82;max-width:1100px;
+}
+.big-title span{color:#999}
+.copy{max-width:480px;color:#666;line-height:1.85;font-size:14px}
+.dark .copy{color:#888}
+
+/* STICKY STORY */
+.story{
+  display:grid;grid-template-columns:1fr 1fr;gap:9vw;align-items:start;margin-top:100px;
+}
+.story-visual{position:sticky;top:10vh;height:72vh;overflow:hidden;background:#111}
+.story-visual:before{
+  content:"";position:absolute;inset:12%;border:1px solid rgba(255,255,255,.2);z-index:2;
+}
+.story-image{
+  position:absolute;inset:-8%;
+  background:url("https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1800&q=90") center/cover;
+  filter:saturate(.55) contrast(1.1);
+}
+.story-shade{position:absolute;inset:0;background:linear-gradient(145deg,rgba(0,0,0,.25),rgba(0,0,0,.8))}
+.story-mark{
+  position:absolute;left:8%;bottom:8%;z-index:3;font:12px "DM Mono";letter-spacing:.16em;color:#aaa;
+}
+.story-items{display:flex;flex-direction:column;gap:120px;padding:12vh 0}
+.story-item{min-height:50vh;display:flex;flex-direction:column;justify-content:center}
+.story-num{font:14px "DM Mono";color:var(--violet);margin-bottom:20px}
+.story-item h3{font:clamp(36px,5vw,72px);font-family:"Space Grotesk";font-weight:500;line-height:.9;letter-spacing:-.06em}
+.story-item p{margin-top:22px;color:#777;max-width:390px;line-height:1.8;font-size:15px}
+
+/* INTERACTIVE TYPE */
+.type-stage{
+  min-height:100svh;display:grid;place-items:center;text-align:center;
+  background:#0a0a0a;overflow:hidden;position:relative;
+}
+.type-stage:before{
+  content:"";position:absolute;width:65vw;height:65vw;border-radius:50%;
+  background:radial-gradient(circle,rgba(141,108,255,.16),transparent 62%);
+  filter:blur(30px);
+}
+.type-word{
+  position:relative;z-index:2;font-family:"Space Grotesk";font-size:clamp(80px,18vw,270px);
+  line-height:.75;letter-spacing:-.11em;white-space:nowrap;color:#f4f4f0;
+  transition:letter-spacing .8s var(--ease),transform .8s var(--ease);
+}
+.type-word:hover{letter-spacing:-.045em;transform:scale(1.03)}
+.type-caption{position:absolute;bottom:7vh;color:#666;font:13px "DM Mono";letter-spacing:.18em}
+
+/* CARDS */
+.cards-section{background:#080808;color:#fff}
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#222;margin-top:80px;border:1px solid #222}
+.card{min-height:600px;background:#080808;padding:30px;position:relative;overflow:hidden}
+.card-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.42;transition:transform 1s var(--ease),opacity 1s}
+.card:nth-child(1) .card-bg{background-image:url("https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=85")}
+.card:nth-child(2) .card-bg{background-image:url("https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=1200&q=85")}
+.card:nth-child(3) .card-bg{background-image:url("https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1200&q=85")}
+.card:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 25%,rgba(0,0,0,.9))}
+.card:hover .card-bg{transform:scale(1.08);opacity:.72}
+.card-top{position:relative;z-index:2;display:flex;justify-content:space-between;font:12px "DM Mono";color:#aaa}
+.card-bottom{position:absolute;z-index:2;left:30px;right:30px;bottom:30px}
+.card-bottom h3{font:500 clamp(35px,4vw,58px) "Space Grotesk";letter-spacing:-.07em;line-height:.85}
+.card-bottom p{margin-top:18px;color:#aaa;font-size:14px;line-height:1.6}
+.card-link{display:inline-flex;margin-top:25px;font:12px "DM Mono";letter-spacing:.17em;text-transform:uppercase;color:var(--acid);gap:15px}
+
+/* CONTACT */
+.contact{
+  min-height:100svh;display:flex;align-items:center;
+  background:var(--acid);color:#050505;
+}
+.contact .eyebrow{color:#4b5a16}
+.contact-title{
+  font:500 clamp(65px,12vw,190px) "Space Grotesk";
+  letter-spacing:-.09em;line-height:.76;
+}
+.contact-title em{font-style:normal;color:#555}
+.contact-bottom{margin-top:70px;display:flex;justify-content:space-between;align-items:end;gap:40px}
+.contact-copy{max-width:390px;font-size:15px;line-height:1.8;color:#39420f}
+.contact-button{
+  border:1px solid #111;padding:17px 22px;font:13px "DM Mono";letter-spacing:.16em;text-transform:uppercase;
+  display:inline-flex;gap:40px;transition:.5s var(--ease)
+}
+.contact-button:hover{background:#050505;color:var(--acid);gap:65px}
+
+/* FOOTER */
+.footer{background:#050505;color:#fff;padding:80px 7vw 30px;position:relative;z-index:6}
+.footer-grid{max-width:1450px;margin:auto;display:flex;justify-content:space-between;align-items:end;gap:30px}
+.footer-brand{font:500 25px "Space Grotesk";letter-spacing:-.04em}
+.footer-brand span{color:var(--acid)}
+.footer small{font:12px "DM Mono";color:#666;letter-spacing:.14em;text-transform:uppercase}
+
+/* REVEALS */
+.split-line{overflow:hidden}
+.split-line span{display:block;transform:translateY(115%);opacity:0}
+.split-line.visible span{transform:none;opacity:1;transition:transform 1.1s var(--ease),opacity 1.1s}
+.reveal{opacity:0;transform:translateY(50px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+.reveal.visible{opacity:1;transform:none}
+
+/* MOBILE */
+@media(max-width:850px){
+  body{cursor:auto}
+  .cursor,.cursor-dot{display:none}
+  .header{grid-template-columns:1fr auto;padding:20px 5vw}
+  .header-center{display:none}
+  .status{display:none}
+  .hero-copy{left:5vw;width:88vw}
+  .hero-title{font-size:clamp(65px,19vw,120px)}
+  .hud{display:none}
+  .section{padding:100px 6vw}
+  .story{grid-template-columns:1fr;gap:40px}
+  .story-visual{position:relative;top:auto;height:55vh}
+  .story-items{padding:0;gap:50px}
+  .story-item{min-height:45vh}
+  .cards-grid{grid-template-columns:1fr}
+  .card{min-height:500px}
+  .contact-bottom{flex-direction:column;align-items:flex-start}
+  .footer-grid{flex-direction:column;align-items:flex-start}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+
+
+/* =========================================================
+   MOBILE RESPONSIVE PATCH — NYX ATELIER
+   Desktop visuals remain unchanged.
+========================================================= */
+@media (max-width: 850px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden}
+  body{cursor:auto}
+  .cursor,.cursor-dot{display:none!important}
+  #webgl{opacity:.88}
+
+  .header{
+    height:72px!important;
+    padding:0 18px!important;
+  }
+  .logo{font-size:18px!important}
+  .header-center{display:none!important}
+  .header-right{gap:10px!important}
+  .status{font-size:11px!important;letter-spacing:.1em!important}
+  .menu-btn{font-size:12px!important;padding:9px 13px!important}
+
+  .hero{min-height:105svh!important;height:auto!important}
+  .hero-sticky{min-height:105svh!important;padding:96px 20px 28px!important}
+  .hero-ui{display:flex!important;justify-content:space-between!important;gap:18px!important;top:92px!important;left:20px!important;right:20px!important}
+  .hero-side{font-size:11px!important;line-height:1.35!important;max-width:140px!important}
+  .hero-side:nth-child(2){text-align:right}
+  .hero-copy{width:100%!important;max-width:none!important;margin-top:26px!important}
+  .hero-kicker{font-size:12px!important;letter-spacing:.15em!important;margin-bottom:22px!important}
+  .hero-title{font-size:clamp(54px,16vw,88px)!important;line-height:.82!important;letter-spacing:-.075em!important}
+  .hero-title .line{display:block!important}
+  .hero-sub{width:min(100%,420px)!important;font-size:14px!important;line-height:1.55!important;margin-top:28px!important}
+  .hero-scroll{left:20px!important;bottom:28px!important;font-size:11px!important}
+  .hero-orbit-label{right:20px!important;bottom:28px!important;font-size:11px!important;writing-mode:vertical-rl!important}
+  .hud{right:18px!important;top:auto!important;bottom:84px!important;width:140px!important;transform:none!important}
+  .hud-row{font-size:11px!important;padding:7px 0!important}
+
+  .section{padding:100px 20px!important}
+  .section-inner{width:100%!important}
+  .eyebrow{font-size:12px!important;letter-spacing:.14em!important}
+  .big-title{font-size:clamp(38px,11vw,62px)!important;line-height:.92!important;letter-spacing:-.055em!important;margin-top:25px!important}
+  .story{grid-template-columns:1fr!important;gap:28px!important;margin-top:54px!important}
+  .story-visual{min-height:58svh!important;height:58svh!important}
+  .story-items{gap:0!important}
+  .story-item{padding:28px 0!important}
+  .story-item h3{font-size:26px!important;line-height:1!important;margin:12px 0!important}
+  .story-item p{font-size:14px!important;line-height:1.6!important;max-width:430px!important}
+  .story-num{font-size:12px!important}
+
+  .type-stage{min-height:72svh!important;height:72svh!important;padding:20px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;overflow:hidden!important}
+  .type-word{font-size:clamp(70px,23vw,150px)!important;line-height:.8!important;letter-spacing:-.09em!important;white-space:nowrap!important}
+  .type-caption{font-size:12px!important;letter-spacing:.12em!important;margin-top:24px!important;text-align:center!important}
+
+  .cards-section{padding-top:100px!important}
+  .cards-grid{grid-template-columns:1fr!important;gap:14px!important;margin-top:46px!important}
+  .card{min-height:62svh!important;height:auto!important}
+  .card-top{font-size:11px!important;padding:18px!important}
+  .card-bottom{padding:22px!important}
+  .card-bottom h3{font-size:42px!important}
+  .card-bottom p{font-size:14px!important;line-height:1.55!important;max-width:300px!important}
+
+  .contact{padding:105px 20px 80px!important;min-height:auto!important}
+  .contact-title{font-size:clamp(54px,16vw,92px)!important;line-height:.84!important;letter-spacing:-.075em!important}
+  .contact-bottom{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:30px!important;margin-top:48px!important}
+  .contact-copy{font-size:14px!important;line-height:1.6!important;max-width:430px!important}
+  .contact-button{width:100%!important;min-height:56px!important;justify-content:space-between!important;padding:0 18px!important}
+
+  .footer{padding:28px 20px!important}
+  .footer-grid{grid-template-columns:1fr!important;gap:10px!important}
+  .footer small{font-size:11px!important}
+}
+
+@media (max-width: 480px){
+  .header{padding:0 14px!important}
+  .status{display:none!important}
+  .hero-sticky{padding-left:16px!important;padding-right:16px!important}
+  .hero-ui{left:16px!important;right:16px!important}
+  .hero-title{font-size:clamp(50px,16.8vw,76px)!important}
+  .hero-sub{font-size:13px!important}
+  .hero-scroll{left:16px!important}
+  .hero-orbit-label{right:16px!important}
+  .hud{right:14px!important;width:130px!important}
+  .section,.contact{padding-left:16px!important;padding-right:16px!important}
+  .story-visual{min-height:52svh!important;height:52svh!important}
+  .type-stage{min-height:62svh!important;height:62svh!important}
+  .type-word{font-size:24vw!important}
+  .card{min-height:55svh!important}
+}
+
+@media (max-width: 360px){
+  .logo{font-size:16px!important}
+  .menu-btn{font-size:11px!important;padding:8px 10px!important}
+  .hero-title{font-size:15.8vw!important}
+  .hero-sub{font-size:13px!important}
+  .hud{display:none!important}
+  .type-word{font-size:23vw!important}
+  .contact-title{font-size:15.5vw!important}
+}
+
+@media (hover:none),(pointer:coarse){
+  .magnetic{transform:none!important}
+  .card:hover,.contact-button:hover{transform:none!important}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .grain{animation:none!important}
+  *,*::before,*::after{scroll-behavior:auto!important}
+}
+
+</style>
+</head>
+
+<body class="loading">
+<canvas id="webgl"></canvas>
+<div class="vignette"></div>
+<div class="grain"></div>
+
+<div class="loader" id="loader">
+  <div class="loader-inner">
+    <div class="loader-top"><span>NYX / SYSTEM</span><span>WEBCRAFT STUDIO</span></div>
+    <div class="loader-word">NYX</div>
+    <div class="loader-track"><span id="loaderBar"></span></div>
+    <div class="loader-percent" id="loaderPercent">00%</div>
+  </div>
+</div>
+
+<div class="cursor-dot"></div>
+<div class="cursor"></div>
+
+<header class="header">
+  <a href="#top" class="logo magnetic">NYX<span>®</span></a>
+  <nav class="header-center">
+    <a href="#manifesto">Manifesto</a>
+    <a href="#work">Experiments</a>
+    <a href="#contact">Enter</a>
+  </nav>
+  <div class="header-right">
+    <div class="status"><i></i> System online</div>
+    <button class="menu-btn">Menu / +</button>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="hero-sticky">
+    <div class="hero-ui">
+      <div class="hero-side">Creative technology / 001</div>
+      <div class="hero-side">Scroll to distort reality</div>
+    </div>
+
+    <div class="hero-copy">
+      <div class="hero-kicker reveal visible">Interactive digital matter</div>
+      <h1 class="hero-title">
+        <span class="line reveal visible">Beyond</span>
+        <span class="line reveal visible">the</span>
+        <span class="line reveal visible"><em>ordinary.</em></span>
+      </h1>
+      <p class="hero-sub reveal visible">
+        NYX is an experimental digital atelier exploring motion,
+        3D, soundless storytelling and interfaces that behave
+        like living systems.
+      </p>
+    </div>
+
+    <div class="hero-scroll">Scroll / <span></span> Experience</div>
+    <div class="hero-orbit-label">Three.js / WebGL / GSAP</div>
+
+    <div class="hud">
+      <div class="hud-row"><span>CORE</span><b>ACTIVE</b></div>
+      <div class="hud-row"><span>FIELD</span><b id="fieldValue">01.00</b></div>
+      <div class="hud-row"><span>FPS</span><b id="fpsValue">60</b></div>
+      <div class="hud-row"><span>MODE</span><b>IMMERSIVE</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="manifesto">
+  <div class="section-inner">
+    <div class="eyebrow reveal">01 / Manifesto</div>
+    <h2 class="big-title reveal">
+      Design should not <span>sit on a screen.</span>
+      It should <span>move you.</span>
+    </h2>
+    <div class="story">
+      <div class="story-visual reveal">
+        <div class="story-image" id="storyImage"></div>
+        <div class="story-shade"></div>
+        <div class="story-mark">NYX / VISUAL SYSTEM 01</div>
+      </div>
+
+      <div class="story-items">
+        <article class="story-item reveal">
+          <div class="story-num">01 — MOTION</div>
+          <h3>Every scroll is a scene.</h3>
+          <p>Transitions become part of the narrative instead of simply moving content from A to B.</p>
+        </article>
+        <article class="story-item reveal">
+          <div class="story-num">02 — DEPTH</div>
+          <h3>Flat pages become dimensions.</h3>
+          <p>WebGL layers, particles, depth and light create interfaces that feel spatial and responsive.</p>
+        </article>
+        <article class="story-item reveal">
+          <div class="story-num">03 — RESPONSE</div>
+          <h3>The interface notices you.</h3>
+          <p>Cursor movement, hover states and velocity can subtly reshape the visual system around the visitor.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="type-stage" id="work">
+  <div class="type-word" id="typeWord">CREATE</div>
+  <div class="type-caption">Move your cursor / distort the word / keep scrolling</div>
+</section>
+
+<section class="section cards-section">
+  <div class="section-inner">
+    <div class="eyebrow reveal">02 / Experiments</div>
+    <h2 class="big-title reveal">Three <span>worlds.</span><br>One interface.</h2>
+
+    <div class="cards-grid">
+      <article class="card reveal">
+        <div class="card-bg"></div>
+        <div class="card-top"><span>EXPERIMENT 01</span><span>01 / 03</span></div>
+        <div class="card-bottom">
+          <h3>Void</h3>
+          <p>Atmospheric interfaces built around darkness, light and controlled movement.</p>
+          <a class="card-link" href="#contact">Explore <span>↗</span></a>
+        </div>
+      </article>
+
+      <article class="card reveal">
+        <div class="card-bg"></div>
+        <div class="card-top"><span>EXPERIMENT 02</span><span>02 / 03</span></div>
+        <div class="card-bottom">
+          <h3>Pulse</h3>
+          <p>Energetic digital systems where typography, particles and rhythm become one.</p>
+          <a class="card-link" href="#contact">Explore <span>↗</span></a>
+        </div>
+      </article>
+
+      <article class="card reveal">
+        <div class="card-bg"></div>
+        <div class="card-top"><span>EXPERIMENT 03</span><span>03 / 03</span></div>
+        <div class="card-bottom">
+          <h3>Human</h3>
+          <p>Premium interfaces designed to feel expressive without sacrificing usability.</p>
+          <a class="card-link" href="#contact">Explore <span>↗</span></a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="section-inner">
+    <div class="eyebrow reveal">03 / Contact</div>
+    <h2 class="contact-title reveal">Make<br><em>something</em><br>impossible.</h2>
+    <div class="contact-bottom reveal">
+      <p class="contact-copy">
+        This is a concept experience created by WebCraft Studio to demonstrate
+        advanced creative development, motion design and interactive web technology.
+      </p>
+      <a class="contact-button magnetic" href="https://wa.me/919380889224?text=Hi%20WebCraft%20Studio%2C%20I%20saw%20the%20NYX%20demo%20and%20want%20a%20premium%20website." target="_blank" rel="noopener">
+        Start a project <span>↗</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div class="footer-brand">WEBCRAFT <span>STUDIO</span> / NYX</div>
+    <small>Creative technology demo / 2026</small>
+    <small>Built with HTML / CSS / JS / Three.js / GSAP</small>
+  </div>
+</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------- LOADER ----------
+  const loader = document.getElementById("loader");
+  const bar = document.getElementById("loaderBar");
+  const percent = document.getElementById("loaderPercent");
+  let progress = 0;
+
+  const loadTimer = setInterval(() => {
+    progress += Math.random() * 10 + 3;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(loadTimer);
+      setTimeout(() => {
+        loader.classList.add("done");
+        document.body.classList.remove("loading");
+        introAnimation();
+      }, 450);
+    }
+    bar.style.width = progress + "%";
+    percent.textContent = String(Math.floor(progress)).padStart(2,"0") + "%";
+  }, 55);
+
+  // ---------- LENIS ----------
+  let lenis = null;
+  if (window.Lenis) {
+    lenis = new Lenis({
+      duration: matchMedia("(pointer:coarse)").matches ? .8 : 1.15,
+      smoothWheel: true,
+      syncTouch: true,
+      touchMultiplier: matchMedia("(pointer:coarse)").matches ? .75 : 1.1
+    });
+
+    function raf(time){
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+  }
+
+  if (window.gsap) {
+    gsap.registerPlugin(ScrollTrigger);
+    if (lenis) {
+      lenis.on("scroll", ScrollTrigger.update);
+      gsap.ticker.add((time) => lenis.raf(time * 1000));
+      gsap.ticker.lagSmoothing(0);
+    }
+  }
+
+  // ---------- CURSOR ----------
+  const dot = document.querySelector(".cursor-dot");
+  const cursor = document.querySelector(".cursor");
+  let mx = innerWidth/2, my = innerHeight/2, cx = mx, cy = my;
+
+  const touchDevice = matchMedia("(hover:none),(pointer:coarse)").matches;
+
+  if(!touchDevice){
+    addEventListener("mousemove", e => {
+      mx = e.clientX; my = e.clientY;
+      dot.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+    });
+
+    function cursorLoop(){
+      cx += (mx-cx)*.12;
+      cy += (my-cy)*.12;
+      cursor.style.transform = `translate(${cx}px,${cy}px) translate(-50%,-50%)`;
+      requestAnimationFrame(cursorLoop);
+    }
+    cursorLoop();
+
+    document.querySelectorAll("a,button,.card,.type-word").forEach(el => {
+      el.addEventListener("mouseenter", () => document.body.classList.add("hovering"));
+      el.addEventListener("mouseleave", () => document.body.classList.remove("hovering"));
+    });
+  }
+
+  // ---------- REVEALS ----------
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add("visible");
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold:.12, rootMargin:"0px 0px -50px 0px"});
+
+  document.querySelectorAll(".reveal").forEach(el => {
+    if(!el.classList.contains("visible")) revealObserver.observe(el);
+  });
+
+  // ---------- GSAP INTRO ----------
+  function introAnimation(){
+    if(!window.gsap) return;
+    gsap.from(".hero-kicker", {y:25,opacity:0,duration:1,ease:"power4.out"});
+    gsap.from(".hero-title .line", {
+      yPercent:120,opacity:0,duration:1.35,stagger:.1,ease:"power4.out",delay:.1
+    });
+    gsap.from(".hero-sub", {y:25,opacity:0,duration:1,ease:"power4.out",delay:.5});
+  }
+
+  // ---------- THREE.JS WEBGL ----------
+  const canvas = document.getElementById("webgl");
+  let scene, camera, renderer, group, particles, core, mouseX=0, mouseY=0;
+  const mobile = matchMedia("(max-width:850px)").matches;
+
+  if (window.THREE) {
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, .1, 100);
+    camera.position.set(0,0,7);
+
+    renderer = new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1.15 : 1.7));
+    renderer.setSize(innerWidth,innerHeight);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+    group = new THREE.Group();
+    scene.add(group);
+
+    // Central glowing core
+    const coreGeo = new THREE.IcosahedronGeometry(1.35,3);
+    const coreMat = new THREE.MeshBasicMaterial({
+      color:0x8d6cff,
+      wireframe:true,
+      transparent:true,
+      opacity:.34
+    });
+    core = new THREE.Mesh(coreGeo,coreMat);
+    group.add(core);
+
+    // Inner solid
+    const innerGeo = new THREE.SphereGeometry(.82,48,48);
+    const innerMat = new THREE.MeshBasicMaterial({
+      color:0x111018,
+      transparent:true,
+      opacity:.9
+    });
+    const inner = new THREE.Mesh(innerGeo,innerMat);
+    group.add(inner);
+
+    // Particle field
+    const count = mobile ? 900 : 3000;
+    const positions = new Float32Array(count*3);
+    const sizes = new Float32Array(count);
+    const colors = new Float32Array(count*3);
+
+    for(let i=0;i<count;i++){
+      const radius = 2.4 + Math.pow(Math.random(),.65)*5.5;
+      const theta = Math.random()*Math.PI*2;
+      const phi = Math.acos((Math.random()*2)-1);
+      const x = radius*Math.sin(phi)*Math.cos(theta);
+      const y = radius*Math.cos(phi);
+      const z = radius*Math.sin(phi)*Math.sin(theta);
+
+      positions[i*3]=x;
+      positions[i*3+1]=y;
+      positions[i*3+2]=z;
+
+      sizes[i]=Math.random()*2+.4;
+
+      const c = Math.random();
+      if(c<.5){ colors[i*3]=.85; colors[i*3+1]=1; colors[i*3+2]=.27; }
+      else { colors[i*3]=.55; colors[i*3+1]=.42; colors[i*3+2]=1; }
+    }
+
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute("position",new THREE.BufferAttribute(positions,3));
+    pGeo.setAttribute("aSize",new THREE.BufferAttribute(sizes,1));
+    pGeo.setAttribute("color",new THREE.BufferAttribute(colors,3));
+
+    const pMat = new THREE.PointsMaterial({
+      size:.025,
+      vertexColors:true,
+      transparent:true,
+      opacity:.75,
+      depthWrite:false,
+      blending:THREE.AdditiveBlending
+    });
+
+    particles = new THREE.Points(pGeo,pMat);
+    group.add(particles);
+
+    // Orbital rings
+    for(let i=0;i<4;i++){
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(1.75+i*.55,.008,8,180),
+        new THREE.MeshBasicMaterial({
+          color:i%2 ? 0xd9ff45 : 0x8d6cff,
+          transparent:true,
+          opacity:.22
+        })
+      );
+      ring.rotation.x = Math.random()*Math.PI;
+      ring.rotation.y = Math.random()*Math.PI;
+      ring.userData.speed = (Math.random()*.004+.001)*(i%2?-1:1);
+      group.add(ring);
+    }
+
+    if(!touchDevice){
+      addEventListener("mousemove",e=>{
+        mouseX=(e.clientX/innerWidth-.5);
+        mouseY=(e.clientY/innerHeight-.5);
+      });
+    }
+
+    let clock = new THREE.Clock();
+
+    function render(){
+      const t=clock.getElapsedTime();
+
+      group.rotation.y += .0015;
+      group.rotation.x = THREE.MathUtils.lerp(group.rotation.x, mouseY*.18, .025);
+      group.rotation.y += (mouseX*.004);
+
+      core.rotation.x=t*.12;
+      core.rotation.y=t*.17;
+      core.scale.setScalar(1+Math.sin(t*1.4)*.035);
+
+      particles.rotation.y=-t*.018;
+      particles.rotation.x=Math.sin(t*.08)*.08;
+
+      group.children.forEach(obj=>{
+        if(obj.userData && obj.userData.speed){
+          obj.rotation.z += obj.userData.speed;
+        }
+      });
+
+      renderer.render(scene,camera);
+      requestAnimationFrame(render);
+    }
+    render();
+
+    addEventListener("resize",()=>{
+      camera.aspect=innerWidth/innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth,innerHeight,false);
+    },{passive:true});
+  }
+
+  // ---------- SCROLL-DRIVEN HERO ----------
+  if(window.gsap){
+    const hero = document.querySelector(".hero");
+    const compactMotion = matchMedia("(max-width:850px)").matches;
+    const heroCopy = document.querySelector(".hero-copy");
+    const hud = document.querySelector(".hud");
+    const heroSide = document.querySelectorAll(".hero-side");
+
+    gsap.to(heroCopy,{
+      y:-220,opacity:0,
+      ease:"none",
+      scrollTrigger:{
+        trigger:hero,start:"top top",end:compactMotion ? "58% top" : "70% top",scrub:compactMotion ? .7 : 1
+      }
+    });
+
+    gsap.to(hud,{
+      x:120,opacity:0,ease:"none",
+      scrollTrigger:{trigger:hero,start:"10% top",end:compactMotion ? "52% top" : "65% top",scrub:compactMotion ? .7 : 1}
+    });
+
+    gsap.to(heroSide,{
+      x:-80,opacity:0,ease:"none",stagger:.05,
+      scrollTrigger:{trigger:hero,start:"10% top",end:compactMotion ? "52% top" : "65% top",scrub:compactMotion ? .7 : 1}
+    });
+
+    gsap.to("#storyImage",{
+      y:"18%",
+      ease:"none",
+      scrollTrigger:{
+        trigger:".story",start:"top bottom",end:"bottom top",scrub:1
+      }
+    });
+
+    gsap.to("#typeWord",{
+      scale:1.45,rotation:2,
+      letterSpacing:"-.035em",
+      ease:"none",
+      scrollTrigger:{
+        trigger:".type-stage",start:"top bottom",end:"bottom top",scrub:1
+      }
+    });
+
+    document.querySelectorAll(".story-item").forEach((item,i)=>{
+      gsap.from(item,{
+        opacity:0,y:80,
+        scrollTrigger:{
+          trigger:item,start:"top 75%",end:"top 45%",scrub:1
+        }
+      });
+    });
+  }
+
+  // ---------- TYPE INTERACTION ----------
+  const typeWord = document.getElementById("typeWord");
+  if(typeWord && !touchDevice){
+    addEventListener("mousemove",e=>{
+      const x=(e.clientX/innerWidth-.5)*2;
+      const y=(e.clientY/innerHeight-.5)*2;
+      typeWord.style.transform=`translate(${x*12}px,${y*12}px) rotate(${x*1.2}deg)`;
+    });
+  }
+
+  // ---------- HUD ----------
+  const fieldValue=document.getElementById("fieldValue");
+  let field=1;
+  setInterval(()=>{
+    field += (Math.random()-.5)*.08;
+    field=Math.max(.8,Math.min(1.25,field));
+    fieldValue.textContent=field.toFixed(2);
+  },160);
+
+  // ---------- MAGNETIC ----------
+  if(!touchDevice){
+    document.querySelectorAll(".magnetic").forEach(el=>{
+      el.addEventListener("mousemove",e=>{
+        const r=el.getBoundingClientRect();
+        const x=(e.clientX-(r.left+r.width/2))*.15;
+        const y=(e.clientY-(r.top+r.height/2))*.15;
+        el.style.transform=`translate(${x}px,${y}px)`;
+      });
+      el.addEventListener("mouseleave",()=>el.style.transform="");
+    });
+  }
+
+  // ---------- SMOOTH ANCHORS ----------
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener("click",e=>{
+      const target=document.querySelector(a.getAttribute("href"));
+      if(!target)return;
+      e.preventDefault();
+      if(lenis) lenis.scrollTo(target,{offset:0});
+      else target.scrollIntoView({behavior:"smooth"});
+    });
+  });
+
+  // ---------- MENU DEMO ----------
+  document.querySelector(".menu-btn").addEventListener("click",()=>{
+    alert("NYX navigation — concept interaction.");
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VANTA Estates — a premium real estate concept website by WebCraft Studio.">
+  <title>VANTA — Estates Beyond Ordinary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0b0b0a;
+      --surface:#121211;
+      --surface-2:#181816;
+      --text:#f4f0e8;
+      --muted:#a8a39a;
+      --line:rgba(244,240,232,.14);
+      --gold:#c9a96a;
+      --gold-soft:#ead7ad;
+      --max:1380px;
+      --ease:cubic-bezier(.16,1,.3,1);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      background:var(--bg);
+      color:var(--text);
+      font-family:"DM Sans",sans-serif;
+      overflow-x:hidden;
+      cursor:none;
+    }
+    a{color:inherit;text-decoration:none}
+    button{font:inherit}
+    ::selection{background:var(--gold);color:#111}
+
+    /* PRELOADER */
+    .loader{
+      position:fixed;inset:0;z-index:9999;
+      background:#080807;
+      display:grid;place-items:center;
+      transition:opacity 1s var(--ease),visibility 1s;
+    }
+    .loader.hide{opacity:0;visibility:hidden;pointer-events:none}
+    .loader-inner{text-align:center}
+    .loader-brand{
+      font-size:12px;letter-spacing:.38em;text-transform:uppercase;
+      color:var(--muted);margin-bottom:22px;
+    }
+    .loader-count{
+      font-family:"Playfair Display",serif;font-size:clamp(54px,9vw,110px);
+      line-height:1;font-variant-numeric:tabular-nums;
+    }
+    .loader-line{width:180px;height:1px;background:var(--line);margin:25px auto 0;overflow:hidden}
+    .loader-line span{display:block;width:0;height:100%;background:var(--gold);transition:width .1s linear}
+
+    /* CURSOR */
+    .cursor-dot,.cursor-ring{
+      position:fixed;left:0;top:0;z-index:10000;pointer-events:none;
+      transform:translate(-50%,-50%);
+    }
+    .cursor-dot{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+    .cursor-ring{
+      width:38px;height:38px;border:1px solid rgba(234,215,173,.7);
+      border-radius:50%;transition:width .3s var(--ease),height .3s var(--ease),background .3s,transform .08s;
+    }
+    body.cursor-hover .cursor-ring{
+      width:64px;height:64px;background:rgba(201,169,106,.08);
+    }
+
+    /* NOISE + BACKGROUND */
+    .noise{
+      position:fixed;inset:0;z-index:50;pointer-events:none;opacity:.055;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+    }
+
+    /* NAV */
+    .nav{
+      position:fixed;top:0;left:0;width:100%;z-index:100;
+      padding:25px 4vw;display:flex;justify-content:space-between;align-items:center;
+      mix-blend-mode:difference;
+    }
+    .logo{font-size:14px;letter-spacing:.34em;text-transform:uppercase}
+    .nav-links{display:flex;gap:34px;font-size:13px;letter-spacing:.16em;text-transform:uppercase}
+    .nav-links a{position:relative}
+    .nav-links a:after{
+      content:"";position:absolute;left:0;bottom:-7px;width:0;height:1px;background:#fff;
+      transition:width .45s var(--ease)
+    }
+    .nav-links a:hover:after{width:100%}
+    .nav-cta{
+      border:1px solid rgba(255,255,255,.4);padding:11px 16px;font-size:13px;
+      letter-spacing:.18em;text-transform:uppercase;transition:.4s var(--ease)
+    }
+    .nav-cta:hover{background:#fff;color:#111}
+
+    /* HERO */
+    .hero{min-height:100svh;position:relative;display:flex;align-items:flex-end;overflow:hidden}
+    .hero-image{
+      position:absolute;inset:0;background:
+      linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.18) 45%,rgba(0,0,0,.82)),
+      url("https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2200&q=90") center/cover;
+      transform:scale(1.08);will-change:transform;
+    }
+    .hero-image:after{
+      content:"";position:absolute;inset:0;
+      background:linear-gradient(90deg,rgba(0,0,0,.5),transparent 65%);
+    }
+    .hero-grid{
+      position:absolute;inset:0;display:grid;grid-template-columns:repeat(6,1fr);
+      opacity:.13;pointer-events:none;
+    }
+    .hero-grid span{border-right:1px solid #fff}
+    .hero-content{
+      position:relative;z-index:2;width:100%;max-width:var(--max);margin:auto;padding:0 4vw 7vh;
+    }
+    .hero-kicker{
+      display:flex;align-items:center;gap:15px;color:#ddd5c8;font-size:13px;
+      letter-spacing:.3em;text-transform:uppercase;margin-bottom:25px;
+      overflow:hidden;
+    }
+    .hero-kicker i{width:55px;height:1px;background:var(--gold);display:block}
+    .hero-title{
+      font-family:"Playfair Display",serif;font-size:clamp(70px,11vw,180px);
+      line-height:.82;font-weight:500;letter-spacing:-.045em;max-width:1100px;
+      overflow:hidden;
+    }
+    .hero-title .line{display:block;overflow:hidden}
+    .hero-title em{color:var(--gold-soft);font-weight:500}
+    .hero-bottom{
+      display:flex;justify-content:space-between;align-items:flex-end;margin-top:45px;
+      gap:30px;max-width:1100px;
+    }
+    .hero-copy{max-width:410px;color:#d0cbc2;font-size:15px;line-height:1.8}
+    .scroll-indicator{font-size:12px;letter-spacing:.25em;text-transform:uppercase;display:flex;align-items:center;gap:14px}
+    .scroll-indicator span{display:block;width:65px;height:1px;background:rgba(255,255,255,.5);position:relative}
+    .scroll-indicator span:after{
+      content:"";position:absolute;left:0;top:0;width:18px;height:1px;background:var(--gold);
+      animation:scrollLine 2s infinite var(--ease)
+    }
+    @keyframes scrollLine{50%{left:47px}100%{left:0}}
+
+    /* SECTIONS */
+    .section{max-width:var(--max);margin:auto;padding:150px 4vw}
+    .eyebrow{font-size:13px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:22px}
+    .section-title{
+      font-family:"Playfair Display",serif;font-size:clamp(48px,7vw,96px);font-weight:500;
+      line-height:.95;letter-spacing:-.035em
+    }
+    .section-title em{color:var(--muted)}
+    .intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:10vw;align-items:end}
+    .intro-copy{max-width:480px;color:var(--muted);font-size:15px;line-height:1.9}
+    .rule{height:1px;background:var(--line);margin:75px 0}
+
+    /* FEATURE */
+    .feature{position:relative;min-height:700px;overflow:hidden}
+    .feature-image{
+      height:700px;background:url("https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1800&q=88") center/cover;
+      transform:scale(1.05);transition:transform 1.4s var(--ease)
+    }
+    .feature:hover .feature-image{transform:scale(1)}
+    .feature-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.68),transparent 70%)}
+    .feature-info{position:absolute;left:6%;bottom:7%;max-width:530px}
+    .feature-info h3{font-family:"Playfair Display",serif;font-size:clamp(42px,5vw,72px);font-weight:500;line-height:.95;margin-bottom:20px}
+    .feature-info p{color:#ccc5b9;line-height:1.7;max-width:430px}
+    .price{margin-top:25px;color:var(--gold-soft);font-size:14px;letter-spacing:.2em;text-transform:uppercase}
+
+    /* PROPERTY GRID */
+    .property-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+    .property{position:relative;min-height:560px;overflow:hidden;background:var(--surface)}
+    .property-image{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform 1.2s var(--ease)}
+    .property:hover .property-image{transform:scale(1.08)}
+    .property:nth-child(1) .property-image{background-image:linear-gradient(0deg,rgba(0,0,0,.55),transparent 60%),url("https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1300&q=85")}
+    .property:nth-child(2) .property-image{background-image:linear-gradient(0deg,rgba(0,0,0,.55),transparent 60%),url("https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1300&q=85")}
+    .property:nth-child(3) .property-image{background-image:linear-gradient(0deg,rgba(0,0,0,.55),transparent 60%),url("https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1300&q=85")}
+    .property:nth-child(4) .property-image{background-image:linear-gradient(0deg,rgba(0,0,0,.55),transparent 60%),url("https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=1300&q=85")}
+    .property-info{position:absolute;left:30px;right:30px;bottom:28px;display:flex;justify-content:space-between;align-items:end;gap:20px}
+    .property-info h3{font-family:"Playfair Display",serif;font-size:36px;font-weight:500}
+    .property-info p{font-size:13px;letter-spacing:.14em;color:#ddd;text-transform:uppercase;margin-top:7px}
+    .property-arrow{width:48px;height:48px;border:1px solid rgba(255,255,255,.45);border-radius:50%;display:grid;place-items:center;transition:.5s var(--ease)}
+    .property:hover .property-arrow{background:#fff;color:#111;transform:rotate(45deg)}
+
+    /* NUMBERS */
+    .numbers{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .number{padding:50px 25px;border-right:1px solid var(--line)}
+    .number:last-child{border-right:0}
+    .number strong{display:block;font-family:"Playfair Display",serif;font-size:70px;font-weight:500}
+    .number span{font-size:12px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+
+    /* MARQUEE */
+    .marquee{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);white-space:nowrap}
+    .marquee-track{display:inline-flex;gap:45px;padding:28px 0;animation:marquee 25s linear infinite}
+    .marquee span{font-family:"Playfair Display",serif;font-size:34px}
+    .marquee i{font-family:"DM Sans",sans-serif;color:var(--gold);font-style:normal}
+    @keyframes marquee{to{transform:translateX(-50%)}}
+
+    /* EXPERIENCE */
+    .experience{display:grid;grid-template-columns:1fr 1fr;gap:10vw;align-items:center}
+    .experience-visual{height:650px;position:relative;overflow:hidden}
+    .experience-image{position:absolute;inset:0;background:url("https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1500&q=88") center/cover}
+    .experience-frame{position:absolute;inset:25px;border:1px solid rgba(255,255,255,.35)}
+    .experience-badge{
+      position:absolute;right:0;bottom:0;background:var(--gold);color:#111;padding:26px;
+      font-size:12px;letter-spacing:.2em;text-transform:uppercase
+    }
+    .experience-copy p{color:var(--muted);line-height:1.9;margin-top:28px;max-width:470px}
+    .outline-button{
+      display:inline-flex;align-items:center;gap:35px;border-bottom:1px solid var(--gold);
+      padding:18px 0;margin-top:38px;font-size:13px;letter-spacing:.18em;text-transform:uppercase;
+      transition:.45s var(--ease)
+    }
+    .outline-button:hover{gap:55px;color:var(--gold-soft)}
+
+    /* FOOTER */
+    footer{padding:120px 4vw 35px;background:#080807}
+    .footer-inner{max-width:var(--max);margin:auto}
+    .footer-title{
+      font-family:"Playfair Display",serif;font-size:clamp(55px,10vw,145px);font-weight:500;
+      line-height:.85;letter-spacing:-.05em
+    }
+    .footer-title em{color:var(--gold-soft)}
+    .footer-row{display:flex;justify-content:space-between;align-items:end;border-top:1px solid var(--line);margin-top:80px;padding-top:28px}
+    .footer-row span{font-size:12px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+    .footer-brand{font-size:13px;letter-spacing:.28em;text-transform:uppercase}
+
+    /* REVEALS */
+    .reveal{opacity:0;transform:translateY(60px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
+    .reveal.visible{opacity:1;transform:none}
+    .delay-1{transition-delay:.12s}.delay-2{transition-delay:.22s}.delay-3{transition-delay:.32s}
+
+    /* MAGNETIC BUTTON */
+    .magnetic{transition:transform .18s ease}
+
+    /* RESPONSIVE */
+    @media(max-width:800px){
+      html{overflow-x:hidden}
+      body{cursor:auto;min-width:0}
+      .cursor-dot,.cursor-ring{display:none}
+      .noise{opacity:.035}
+
+      .nav{padding:18px 5vw;gap:14px}
+      .logo{font-size:12px;letter-spacing:.24em;white-space:nowrap}
+      .nav-links{display:none}
+      .nav-cta{padding:10px 12px;font-size:12px;letter-spacing:.12em;white-space:nowrap}
+
+      .hero{min-height:100svh;height:auto}
+      .hero-image{background-position:center center}
+      .hero-grid{opacity:.35}
+      .hero-content{padding:110px 5vw 42px;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end}
+      .hero-kicker{font-size:12px;letter-spacing:.22em;margin-bottom:24px}
+      .hero-title{font-size:clamp(54px,16.5vw,92px);line-height:.88;letter-spacing:-.045em;max-width:100%}
+      .hero-bottom,.intro-grid,.experience{grid-template-columns:1fr;display:grid}
+      .hero-bottom{gap:26px;margin-top:28px}
+      .hero-copy{font-size:14px;line-height:1.7;max-width:330px}
+      .scroll-indicator{font-size:11px;justify-self:start}
+
+      .section{padding:78px 5vw}
+      .intro-grid{gap:28px}
+      .section-title{font-size:clamp(42px,12vw,70px);line-height:.95}
+      .intro-copy{font-size:14px;line-height:1.75;max-width:100%}
+      .rule{margin:48px 0 0}
+
+      .feature{min-height:0;height:560px}
+      .feature-image{min-height:560px;height:560px}
+      .feature-info{padding:25px}
+      .feature-info h3{font-size:clamp(35px,10vw,58px)}
+      .feature-info p{font-size:14px;line-height:1.65}
+      .price{font-size:12px}
+
+      .marquee-track{gap:28px;padding:22px 0}
+      .marquee span{font-size:27px}
+
+      .property-grid{grid-template-columns:1fr;gap:18px}
+      .property{min-height:440px}
+      .property-image{min-height:440px}
+      .property-info{padding:22px}
+      .property-info h3{font-size:32px}
+      .property-arrow{width:42px;height:42px}
+
+      .numbers{grid-template-columns:1fr}
+      .number{padding:36px 20px}
+      .number strong{font-size:58px}
+
+      .experience{gap:48px}
+      .experience-visual{height:470px}
+      .experience-frame{inset:16px}
+      .experience-badge{padding:19px;font-size:11px}
+      .experience-copy p{font-size:14px;line-height:1.75}
+      .outline-button{gap:22px;font-size:12px;margin-top:30px;max-width:100%}
+
+      footer{padding:78px 5vw 28px}
+      .footer-title{font-size:clamp(52px,15vw,90px);line-height:.88}
+      .footer-row{align-items:flex-start;gap:18px;flex-direction:column;margin-top:55px}
+
+      a,button,.property,.feature{touch-action:manipulation}
+    }
+
+    @media(max-width:480px){
+      .nav{padding:16px 4.5vw}
+      .logo{font-size:12px;letter-spacing:.2em}
+      .nav-cta{font-size:11px;padding:9px 10px}
+      .hero-content{padding-left:4.5vw;padding-right:4.5vw}
+      .hero-title{font-size:clamp(48px,16vw,76px)}
+      .hero-bottom{gap:22px}
+      .section{padding:68px 4.5vw}
+      .eyebrow{font-size:11px;letter-spacing:.18em}
+      .section-title{font-size:clamp(38px,11.5vw,58px)}
+      .feature,.feature-image{height:500px;min-height:500px}
+      .feature-info{padding:20px}
+      .property,.property-image{min-height:390px}
+      .experience-visual{height:390px}
+      .experience-frame{inset:12px}
+      .footer-title{font-size:clamp(48px,14vw,76px)}
+    }
+
+    @media(max-width:360px){
+      .nav-cta{font-size:11px;letter-spacing:.08em;padding:8px 8px}
+      .hero-title{font-size:47px}
+      .hero-copy{font-size:13px}
+      .feature,.feature-image{height:450px;min-height:450px}
+      .property,.property-image{min-height:350px}
+      .experience-visual{height:350px}
+    }
+
+    @media(prefers-reduced-motion:reduce){
+      *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="loader" id="loader">
+    <div class="loader-inner">
+      <div class="loader-brand">WebCraft Studio / Demo 03</div>
+      <div class="loader-count" id="loaderCount">0</div>
+      <div class="loader-line"><span id="loaderBar"></span></div>
+    </div>
+  </div>
+
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+  <div class="noise"></div>
+
+  <header class="nav">
+    <a class="logo magnetic" href="#top">VANTA / ESTATES</a>
+    <nav class="nav-links">
+      <a href="#residences">Residences</a>
+      <a href="#experience">Experience</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="nav-cta magnetic" href="#contact">Private Viewing ↗</a>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-image" data-parallax="0.08"></div>
+      <div class="hero-grid"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+
+      <div class="hero-content">
+        <div class="hero-kicker reveal visible">
+          <i></i> Private residences / Bengaluru · Goa · Dubai
+        </div>
+
+        <h1 class="hero-title">
+          <span class="line reveal visible">Live</span>
+          <span class="line reveal visible delay-1">beyond</span>
+          <span class="line reveal visible delay-2"><em>ordinary.</em></span>
+        </h1>
+
+        <div class="hero-bottom reveal visible delay-3">
+          <p class="hero-copy">
+            Curated residences for people who believe architecture should
+            feel as exceptional as the life lived inside it.
+          </p>
+          <div class="scroll-indicator">Explore <span></span> Scroll</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="residences">
+      <div class="intro-grid reveal">
+        <div>
+          <div class="eyebrow">01 / The Collection</div>
+          <h2 class="section-title">Spaces with <em>a point of view.</em></h2>
+        </div>
+        <p class="intro-copy">
+          VANTA brings together architectural homes and private residences
+          selected for their location, materiality, light and enduring character.
+          Every detail is considered. Nothing is accidental.
+        </p>
+      </div>
+
+      <div class="rule"></div>
+
+      <article class="feature reveal">
+        <div class="feature-image" data-parallax="0.04"></div>
+        <div class="feature-overlay"></div>
+        <div class="feature-info">
+          <div class="eyebrow">Featured Residence / 01</div>
+          <h3>Casa Aurelia</h3>
+          <p>
+            A sculptural hillside residence where warm stone, glass and
+            landscape meet in complete privacy.
+          </p>
+          <div class="price">From ₹4.8 Cr · Goa</div>
+        </div>
+      </article>
+    </section>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>ARCHITECTURE <i>✦</i> PRIVACY <i>✦</i> CRAFT <i>✦</i> TIMELESS LIVING <i>✦</i></span>
+        <span>ARCHITECTURE <i>✦</i> PRIVACY <i>✦</i> CRAFT <i>✦</i> TIMELESS LIVING <i>✦</i></span>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="eyebrow reveal">02 / Selected Residences</div>
+      <div class="property-grid">
+        <article class="property reveal">
+          <div class="property-image"></div>
+          <div class="property-info">
+            <div><h3>Oak House</h3><p>Bengaluru / ₹3.2 Cr</p></div>
+            <div class="property-arrow">↗</div>
+          </div>
+        </article>
+
+        <article class="property reveal delay-1">
+          <div class="property-image"></div>
+          <div class="property-info">
+            <div><h3>Verde Villa</h3><p>Goa / ₹5.6 Cr</p></div>
+            <div class="property-arrow">↗</div>
+          </div>
+        </article>
+
+        <article class="property reveal delay-1">
+          <div class="property-image"></div>
+          <div class="property-info">
+            <div><h3>Casa No. 09</h3><p>Alibaug / ₹6.1 Cr</p></div>
+            <div class="property-arrow">↗</div>
+          </div>
+        </article>
+
+        <article class="property reveal delay-2">
+          <div class="property-image"></div>
+          <div class="property-info">
+            <div><h3>The Courtyard</h3><p>Dubai / AED 8.4M</p></div>
+            <div class="property-arrow">↗</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="numbers">
+        <div class="number reveal"><strong data-count="18">0</strong><span>Private residences</span></div>
+        <div class="number reveal delay-1"><strong data-count="7">0</strong><span>Design partners</span></div>
+        <div class="number reveal delay-2"><strong data-count="12">0</strong><span>Years of craft</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="experience">
+      <div class="experience">
+        <div class="experience-visual reveal">
+          <div class="experience-image" data-parallax="0.05"></div>
+          <div class="experience-frame"></div>
+          <div class="experience-badge">Private by design</div>
+        </div>
+
+        <div class="experience-copy reveal delay-1">
+          <div class="eyebrow">03 / The VANTA Experience</div>
+          <h2 class="section-title">Not just a property.<br><em>A way of living.</em></h2>
+          <p>
+            From the first private viewing to the moment you unlock the door,
+            every interaction is designed around discretion, clarity and an
+            exceptional standard of service.
+          </p>
+          <a class="outline-button magnetic" href="#contact">Arrange a private viewing <span>↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact">
+      <div class="reveal">
+        <div class="eyebrow">04 / Private Enquiries</div>
+        <h2 class="section-title">Your next address<br><em>starts here.</em></h2>
+        <p class="intro-copy" style="margin-top:35px">
+          Tell us what you are looking for and our private client team will
+          arrange a discreet conversation.
+        </p>
+        <a class="outline-button magnetic" href="https://wa.me/919380889224?text=Hi%20WebCraft%20Studio%2C%20I'm%20interested%20in%20the%20VANTA%20Estates%20demo." target="_blank" rel="noopener">
+          Request a private viewing <span>↗</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="eyebrow">VANTA / ESTATES</div>
+      <h2 class="footer-title">Live <em>beautifully.</em></h2>
+      <div class="footer-row">
+        <span>Concept website / WebCraft Studio</span>
+        <span class="footer-brand">Designed to be remembered</span>
+        <span>© 2026</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const loader = document.getElementById("loader");
+      const count = document.getElementById("loaderCount");
+      const bar = document.getElementById("loaderBar");
+
+      let n = 0;
+      const loading = setInterval(() => {
+        n += Math.floor(Math.random() * 8) + 3;
+        if (n >= 100) {
+          n = 100;
+          clearInterval(loading);
+          setTimeout(() => loader.classList.add("hide"), 350);
+        }
+        count.textContent = n;
+        bar.style.width = n + "%";
+      }, 45);
+
+      // Custom cursor
+      const dot = document.querySelector(".cursor-dot");
+      const ring = document.querySelector(".cursor-ring");
+      let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
+
+      window.addEventListener("mousemove", e => {
+        mx = e.clientX; my = e.clientY;
+        dot.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+      });
+
+      function cursorLoop(){
+        rx += (mx-rx)*0.14;
+        ry += (my-ry)*0.14;
+        ring.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+        requestAnimationFrame(cursorLoop);
+      }
+      cursorLoop();
+
+      document.querySelectorAll("a,.property,.feature,.magnetic").forEach(el => {
+        el.addEventListener("mouseenter", () => document.body.classList.add("cursor-hover"));
+        el.addEventListener("mouseleave", () => document.body.classList.remove("cursor-hover"));
+      });
+
+      // Reveal on scroll
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting){
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {threshold:.12, rootMargin:"0px 0px -60px 0px"});
+
+      document.querySelectorAll(".reveal").forEach(el => {
+        if(!el.classList.contains("visible")) observer.observe(el);
+      });
+
+      // Parallax — keep touch devices stable and light.
+      const parallaxEls = document.querySelectorAll("[data-parallax]");
+      let ticking = false;
+      const canParallax = window.matchMedia("(pointer:fine)").matches;
+
+      function updateParallax(){
+        if(!canParallax) return;
+        const scrollY = window.scrollY;
+        parallaxEls.forEach(el => {
+          const speed = parseFloat(el.dataset.parallax || "0");
+          const rect = el.parentElement.getBoundingClientRect();
+          if(rect.bottom > 0 && rect.top < innerHeight){
+            el.style.transform = `translate3d(0,${(scrollY - (rect.top + scrollY)) * speed}px,0) scale(1.06)`;
+          }
+        });
+        ticking = false;
+      }
+
+      if(canParallax){
+        window.addEventListener("scroll", () => {
+          if(!ticking){ requestAnimationFrame(updateParallax); ticking = true; }
+        }, {passive:true});
+      }
+
+      // Magnetic buttons — desktop/fine pointer only.
+      if(canParallax){
+      document.querySelectorAll(".magnetic").forEach(el => {
+        el.addEventListener("mousemove", e => {
+          const r = el.getBoundingClientRect();
+          const x = (e.clientX - (r.left + r.width/2)) * .18;
+          const y = (e.clientY - (r.top + r.height/2)) * .18;
+          el.style.transform = `translate(${x}px,${y}px)`;
+        });
+        el.addEventListener("mouseleave", () => el.style.transform = "");
+      });
+      }
+
+      // Animated counters
+      const counters = document.querySelectorAll("[data-count]");
+      const counterObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if(!entry.isIntersecting) return;
+          const el = entry.target;
+          const target = +el.dataset.count;
+          const start = performance.now();
+          const duration = 1300;
+
+          function tick(now){
+            const p = Math.min((now-start)/duration,1);
+            const eased = 1-Math.pow(1-p,3);
+            el.textContent = Math.floor(target*eased);
+            if(p<1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+          counterObserver.unobserve(el);
+        });
+      }, {threshold:.7});
+      counters.forEach(el => counterObserver.observe(el));
+
+      // 3D tilt for property cards
+      if(window.matchMedia("(pointer:fine)").matches){
+        document.querySelectorAll(".property").forEach(card => {
+          card.addEventListener("mousemove", e => {
+            const r = card.getBoundingClientRect();
+            const x = (e.clientX-r.left)/r.width-.5;
+            const y = (e.clientY-r.top)/r.height-.5;
+            card.style.transform = `perspective(1000px) rotateY(${x*2.2}deg) rotateX(${-y*2.2}deg)`;
+          });
+          card.addEventListener("mouseleave", () => {
+            card.style.transform = "";
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>

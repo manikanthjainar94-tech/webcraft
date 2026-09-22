@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Aura Studio — Hair, skin and beauty in Bengaluru.">
+<title>Aura Studio — Beauty, Redefined</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@400;500;600&display=swap');
+
+:root{
+  --bg:#eee7df;
+  --ink:#28231f;
+  --muted:#776d64;
+  --rose:#b99380;
+  --cream:#f7f2eb;
+  --line:rgba(40,35,31,.14);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:"DM Sans",sans-serif;line-height:1.5}
+img{display:block;width:100%;height:100%;object-fit:cover}
+a{color:inherit}
+
+.nav{
+  position:fixed;
+  z-index:20;
+  top:0;left:0;width:100%;
+  padding:22px 5vw;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(238,231,223,.78);
+  backdrop-filter:blur(15px);
+  border-bottom:1px solid rgba(40,35,31,.07);
+}
+.logo{font-family:"Playfair Display",serif;font-size:21px}
+.links{display:flex;gap:28px;align-items:center}
+.links a{
+  color:var(--ink);
+  text-decoration:none;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  font-size:13px;
+}
+.book{padding:11px 17px;border:1px solid var(--ink)}
+
+/* HERO */
+
+.hero{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:.9fr 1.1fr;
+  align-items:center;
+  padding:120px 7vw 70px;
+  gap:8vw;
+}
+
+.eyebrow{
+  font-size:13px;
+  text-transform:uppercase;
+  letter-spacing:.23em;
+  color:var(--rose);
+}
+
+.hero h1{
+  font-family:"Playfair Display",serif;
+  font-weight:400;
+  font-size:clamp(70px,9vw,135px);
+  line-height:.82;
+  letter-spacing:-.06em;
+  margin:25px 0;
+}
+
+.hero h1 em{font-weight:400}
+.hero p{max-width:430px;color:var(--muted);font-size:15px;line-height:1.7}
+
+.actions{
+  display:flex;
+  gap:12px;
+  margin-top:32px;
+}
+
+.btn{
+  padding:14px 20px;
+  background:var(--ink);
+  color:var(--cream);
+  text-decoration:none;
+  text-transform:uppercase;
+  font-size:13px;
+  letter-spacing:.13em;
+  transition:.35s ease;
+}
+.btn:hover{transform:translateY(-3px)}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+
+/* HERO IMAGE */
+
+.hero-image{
+  height:680px;
+  position:relative;
+  overflow:hidden;
+  background:#c7a89a;
+}
+
+.hero-image img{
+  transition:transform 1.2s cubic-bezier(.22,1,.36,1);
+}
+
+.hero-image:hover img{transform:scale(1.045)}
+
+.hero-image::after{
+  content:"AURA / 01";
+  position:absolute;
+  right:28px;
+  bottom:24px;
+  color:#f4e9df;
+  font-size:12px;
+  letter-spacing:.2em;
+  text-shadow:0 2px 10px rgba(0,0,0,.5);
+}
+
+/* SOFT IMAGE OVERLAY */
+
+.image-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.2));
+  pointer-events:none;
+}
+
+/* SECTIONS */
+
+.section{padding:130px 7vw}
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  gap:50px;
+  margin-bottom:60px;
+}
+
+.section h2{
+  font-family:"Playfair Display",serif;
+  font-size:clamp(45px,6vw,80px);
+  font-weight:400;
+  line-height:.95;
+}
+
+.section-head p{
+  max-width:400px;
+  color:var(--muted);
+  line-height:1.7;
+}
+
+/* SERVICES */
+
+.services{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--line);
+}
+
+.service{
+  padding:32px 25px;
+  border-bottom:1px solid var(--line);
+  border-right:1px solid var(--line);
+}
+
+.service:nth-child(3n){border-right:0}
+
+.service span{
+  color:var(--rose);
+  font-size:13px;
+  letter-spacing:.16em;
+}
+
+.service h3{
+  font-family:"Playfair Display",serif;
+  font-size:31px;
+  font-weight:400;
+  margin:12px 0;
+}
+
+.service p{
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.7;
+}
+
+.service strong{
+  display:block;
+  margin-top:22px;
+  font-size:14px;
+}
+
+/* BEAUTY GALLERY */
+
+.beauty-gallery{
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:16px;
+}
+
+.gallery-main{
+  height:620px;
+  position:relative;
+  overflow:hidden;
+}
+
+.gallery-side{
+  display:grid;
+  grid-template-rows:1fr 1fr;
+  gap:16px;
+}
+
+.gallery-side figure{
+  min-height:300px;
+  position:relative;
+  overflow:hidden;
+}
+
+.beauty-gallery img{
+  transition:transform .9s cubic-bezier(.22,1,.36,1);
+}
+
+.beauty-gallery figure:hover img{transform:scale(1.06)}
+
+.gallery-label{
+  position:absolute;
+  left:22px;
+  bottom:20px;
+  z-index:2;
+  color:white;
+  font-size:13px;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  text-shadow:0 2px 12px rgba(0,0,0,.65);
+}
+
+.gallery-main .image-overlay,
+.gallery-side .image-overlay{
+  background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.35));
+}
+
+/* EXPERIENCE */
+
+.experience{
+  background:var(--cream);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:70px;
+}
+
+.experience .big{
+  font-family:"Playfair Display",serif;
+  font-size:clamp(40px,5vw,65px);
+  line-height:1.05;
+}
+
+.experience p{
+  color:var(--muted);
+  line-height:1.8;
+  max-width:470px;
+}
+
+/* TESTIMONIAL */
+
+.testimonial{
+  display:grid;
+  grid-template-columns:.8fr 1.2fr;
+  gap:80px;
+  align-items:center;
+}
+
+.testimonial-image{
+  height:500px;
+  overflow:hidden;
+}
+
+.testimonial-image img{
+  transition:transform .8s ease;
+}
+
+.testimonial-image:hover img{transform:scale(1.04)}
+
+.testimonial blockquote{
+  font-family:"Playfair Display",serif;
+  font-size:clamp(35px,4vw,58px);
+  line-height:1.05;
+}
+
+.testimonial cite{
+  display:block;
+  margin-top:30px;
+  color:var(--muted);
+  font-size:13px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+
+/* BOOKING */
+
+.booking{
+  text-align:center;
+  background:#c5a395;
+}
+
+.booking h2{
+  font-family:"Playfair Display",serif;
+  font-size:clamp(55px,8vw,110px);
+  font-weight:400;
+  line-height:.9;
+}
+
+.booking p{
+  margin:22px auto 30px;
+  color:#5f4d44;
+}
+
+/* FOOTER */
+
+.footer{
+  padding:28px 7vw;
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  letter-spacing:.12em;
+  border-top:1px solid var(--line);
+}
+
+/* RESPONSIVE */
+
+@media(max-width:900px){
+  .hero,.experience,.testimonial{grid-template-columns:1fr}
+  .hero{padding-top:120px}
+  .hero-image{height:540px}
+  .services{grid-template-columns:1fr}
+  .service{border-right:0}
+  .section-head{flex-direction:column}
+  .beauty-gallery{grid-template-columns:1fr}
+  .gallery-main{height:500px}
+}
+
+@media(max-width:650px){
+  .links a:not(.book){display:none}
+  .nav{padding:20px}
+  .hero{padding:120px 22px 60px}
+  .hero h1{font-size:68px}
+  .hero-image{height:470px}
+  .section{padding:90px 22px}
+  .gallery-side{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+  .gallery-main{height:390px}
+  .gallery-side figure{min-height:270px}
+  .testimonial-image{height:390px}
+  .footer{padding:25px 22px;flex-direction:column;gap:8px}
+}
+</style>
+
+<style>
+/* MOBILE POLISH */
+html,body{overflow-x:hidden}
+.mobile-menu-button,.mobile-menu{display:none}
+
+@media (max-width:900px){
+  .hero{gap:48px}
+  .hero h1{font-size:clamp(60px,11vw,96px)}
+  .hero-image{height:min(68vw,540px);min-height:420px}
+  .service h3{font-size:28px}
+  .testimonial{gap:45px}
+  .testimonial-image{height:min(78vw,500px)}
+  .booking h2{font-size:clamp(52px,10vw,88px)}
+}
+
+@media (max-width:650px){
+  .nav{padding:17px 20px}
+  .logo{font-size:19px}
+  .links{display:none}
+  .mobile-menu-button{
+    display:flex;flex-direction:column;justify-content:center;gap:5px;
+    width:44px;height:44px;padding:10px;border:1px solid rgba(40,35,31,.25);
+    background:transparent;color:var(--ink);cursor:pointer;position:relative;z-index:31;
+  }
+  .mobile-menu-button span{display:block;width:100%;height:1px;background:currentColor;transition:transform .3s ease,opacity .3s ease}
+  .mobile-menu-button[aria-expanded="true"] span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+  .mobile-menu-button[aria-expanded="true"] span:nth-child(2){opacity:0}
+  .mobile-menu-button[aria-expanded="true"] span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+  .mobile-menu{
+    display:flex;position:fixed;z-index:30;top:0;right:0;width:min(86vw,360px);height:100dvh;
+    padding:105px 28px 35px;flex-direction:column;justify-content:flex-start;gap:0;
+    background:rgba(247,242,235,.98);box-shadow:-20px 0 60px rgba(40,35,31,.12);
+    transform:translateX(105%);transition:transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .mobile-menu.open{transform:translateX(0)}
+  .mobile-menu a{
+    padding:20px 0;border-bottom:1px solid var(--line);text-decoration:none;
+    text-transform:uppercase;letter-spacing:.14em;font-size:14px;
+  }
+  body.menu-open{overflow:hidden}
+  .hero{padding:112px 22px 55px;gap:42px;min-height:auto}
+  .hero h1{font-size:clamp(58px,17vw,82px);line-height:.86;margin:20px 0}
+  .hero p{font-size:14px;max-width:none}
+  .actions{flex-wrap:wrap;gap:10px;margin-top:25px}
+  .actions .btn{flex:1 1 150px;text-align:center;min-height:46px;display:flex;align-items:center;justify-content:center}
+  .hero-image{height:118vw;min-height:390px;max-height:520px}
+  .section{padding:82px 22px}
+  .section-head{gap:24px;margin-bottom:38px}
+  .section h2{font-size:clamp(43px,12vw,64px)}
+  .section-head p{font-size:14px;max-width:none}
+  .services{grid-template-columns:1fr}
+  .service{padding:27px 0;border-right:0}
+  .service h3{font-size:29px}
+  .service p{font-size:15px;max-width:520px}
+  .beauty-gallery{grid-template-columns:1fr;gap:12px}
+  .gallery-main{height:105vw;min-height:350px;max-height:470px}
+  .gallery-side{grid-template-columns:1fr;grid-template-rows:auto;gap:12px}
+  .gallery-side figure{min-height:300px;height:78vw;max-height:390px}
+  .experience{gap:30px}
+  .experience .big{font-size:clamp(40px,11vw,58px)}
+  .testimonial{gap:32px}
+  .testimonial-image{height:105vw;min-height:340px;max-height:430px}
+  .testimonial blockquote{font-size:clamp(34px,9vw,50px)}
+  .testimonial cite{margin-top:22px}
+  .booking h2{font-size:clamp(48px,14vw,70px)}
+  .booking p{font-size:14px;max-width:340px}
+  .booking .btn{display:inline-flex;min-height:48px;align-items:center;justify-content:center}
+  .footer{padding:24px 22px;flex-direction:column;gap:9px}
+}
+
+@media (max-width:360px){
+  .nav{padding-left:16px;padding-right:16px}
+  .logo{font-size:17px}
+  .hero,.section{padding-left:17px;padding-right:17px}
+  .hero h1{font-size:56px}
+  .hero-image{min-height:340px}
+  .section h2{font-size:42px}
+  .service h3{font-size:27px}
+  .booking h2{font-size:46px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .mobile-menu,.mobile-menu-button span,.hero-image img,.btn{transition:none!important}
+}
+</style>
+</head>
+
+<body>
+
+<header class="nav">
+  <div class="logo">AURA STUDIO</div>
+
+  <nav class="links">
+    <a href="#services">Services</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#experience">Experience</a>
+    <a href="#book" class="book">Book appointment</a>
+  </nav>
+
+  <button class="mobile-menu-button" type="button" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="mobile-menu" aria-hidden="true">
+    <a href="#services">Services</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#experience">Experience</a>
+    <a href="#book">Book appointment</a>
+  </div>
+</header>
+
+<main>
+
+<!-- HERO -->
+
+<section class="hero">
+
+  <div>
+    <div class="eyebrow">Hair · Skin · Beauty</div>
+
+    <h1>
+      Beauty,
+      <br>
+      <em>redefined.</em>
+    </h1>
+
+    <p>
+      A modern beauty studio for thoughtful cuts,
+      considered colour and skin rituals designed
+      around you.
+    </p>
+
+    <div class="actions">
+      <a class="btn" href="#services">Explore services</a>
+      <a class="btn alt" href="#book">Book now</a>
+    </div>
+  </div>
+
+  <div class="hero-image">
+    <img
+      src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&fm=jpg&q=85&w=1400"
+      alt="Elegant modern hair salon interior"
+    >
+    <div class="image-overlay"></div>
+  </div>
+
+</section>
+
+
+<!-- SERVICES -->
+
+<section class="section" id="services">
+
+  <div class="section-head">
+    <h2>
+      Services
+      <br>
+      with intention.
+    </h2>
+
+    <p>
+      We believe beauty works best when it feels personal.
+      Every appointment starts with a conversation and ends
+      with a result you can live in.
+    </p>
+  </div>
+
+
+  <div class="services">
+
+    <article class="service">
+      <span>01 · HAIR</span>
+      <h3>Signature Cut</h3>
+      <p>
+        Consultation, cut, styling and a finish tailored
+        to your everyday routine.
+      </p>
+      <strong>FROM ₹1,200</strong>
+    </article>
+
+    <article class="service">
+      <span>02 · COLOUR</span>
+      <h3>Soft Colour</h3>
+      <p>
+        Dimensional colour with a natural grow-out
+        and low-maintenance finish.
+      </p>
+      <strong>FROM ₹3,500</strong>
+    </article>
+
+    <article class="service">
+      <span>03 · SKIN</span>
+      <h3>Glow Ritual</h3>
+      <p>
+        A calming facial treatment focused on hydration,
+        texture and healthy glow.
+      </p>
+      <strong>FROM ₹1,800</strong>
+    </article>
+
+    <article class="service">
+      <span>04 · HAIR</span>
+      <h3>Blowout</h3>
+      <p>
+        A polished wash and finish for dinners,
+        events or simply feeling good.
+      </p>
+      <strong>FROM ₹800</strong>
+    </article>
+
+    <article class="service">
+      <span>05 · SKIN</span>
+      <h3>Deep Cleanse</h3>
+      <p>
+        A restorative treatment for congested skin
+        with a gentle, balanced approach.
+      </p>
+      <strong>FROM ₹2,000</strong>
+    </article>
+
+    <article class="service">
+      <span>06 · BEAUTY</span>
+      <h3>Event Edit</h3>
+      <p>
+        Hair and beauty styling designed around your
+        event, outfit and mood.
+      </p>
+      <strong>FROM ₹2,500</strong>
+    </article>
+
+  </div>
+
+</section>
+
+
+<!-- BEAUTY GALLERY -->
+
+<section class="section" id="gallery">
+
+  <div class="section-head">
+    <h2>
+      A quieter
+      <br>
+      kind of beauty.
+    </h2>
+
+    <p>
+      Warm light, considered details and a calm studio
+      environment. Aura is designed to make the whole
+      appointment feel like time well spent.
+    </p>
+  </div>
+
+
+  <div class="beauty-gallery">
+
+    <figure class="gallery-main">
+
+      <img
+        src="https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&fm=jpg&q=85&w=1400"
+        alt="Hair stylist working in a salon"
+        loading="lazy"
+      >
+
+      <div class="image-overlay"></div>
+
+      <figcaption class="gallery-label">
+        The Aura experience
+      </figcaption>
+
+    </figure>
+
+
+    <div class="gallery-side">
+
+      <figure>
+
+        <img
+          src="https://images.unsplash.com/photo-1600948836101-f9ffda59d250?auto=format&fit=crop&fm=jpg&q=85&w=1000"
+          alt="Hair styling in a beauty salon"
+          loading="lazy"
+        >
+
+        <div class="image-overlay"></div>
+
+        <figcaption class="gallery-label">
+          Hair · Colour · Care
+        </figcaption>
+
+      </figure>
+
+
+      <figure>
+
+        <img
+          src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&fm=jpg&q=85&w=1000"
+          alt="Facial skincare treatment"
+          loading="lazy"
+        >
+
+        <div class="image-overlay"></div>
+
+        <figcaption class="gallery-label">
+          Skin rituals
+        </figcaption>
+
+      </figure>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- EXPERIENCE -->
+
+<section class="section experience" id="experience">
+
+  <div>
+    <div class="eyebrow">The Aura experience</div>
+
+    <p class="big">
+      A quieter kind of beauty studio.
+    </p>
+  </div>
+
+  <div>
+
+    <p>
+      Warm light. Good music. No rushed appointments.
+      Aura Studio is a space to slow down while our team
+      takes care of the details.
+    </p>
+
+    <p style="margin-top:25px">
+      Located in Indiranagar, Bengaluru.
+      Tuesday — Sunday, 10:00 AM — 8:00 PM.
+    </p>
+
+  </div>
+
+</section>
+
+
+<!-- TESTIMONIAL -->
+
+<section class="section testimonial">
+
+  <div class="testimonial-image">
+
+    <img
+      src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&fm=jpg&q=85&w=1000"
+      alt="Beauty portrait"
+      loading="lazy"
+    >
+
+  </div>
+
+  <div>
+
+    <div class="eyebrow">Client note</div>
+
+    <blockquote>
+      “I walked in wanting a change
+      and walked out feeling completely
+      like myself.”
+    </blockquote>
+
+    <cite>
+      — Meera · Aura Studio client
+    </cite>
+
+  </div>
+
+</section>
+
+
+<!-- BOOKING -->
+
+<section class="section booking" id="book">
+
+  <div class="eyebrow">Your appointment</div>
+
+  <h2>
+    Make time
+    <br>
+    for you.
+  </h2>
+
+  <p>
+    Tell us what you'd like and we'll help you
+    choose the right service.
+  </p>
+
+  <a
+    class="btn"
+    href="https://wa.me/919380889224?text=Hi%20Aura%20Studio%2C%20I%27d%20like%20to%20book%20an%20appointment."
+    target="_blank"
+    rel="noopener"
+  >
+    Book via WhatsApp
+  </a>
+
+</section>
+
+</main>
+
+
+<footer class="footer">
+  <span>AURA STUDIO</span>
+  <span>Indiranagar · Bengaluru</span>
+  <span>© 2026</span>
+</footer>
+
+
+<script>
+(function(){
+  const button=document.querySelector('.mobile-menu-button');
+  const menu=document.querySelector('.mobile-menu');
+  if(!button || !menu) return;
+  const close=()=>{button.setAttribute('aria-expanded','false');button.setAttribute('aria-label','Open menu');menu.classList.remove('open');menu.setAttribute('aria-hidden','true');document.body.classList.remove('menu-open')};
+  button.addEventListener('click',()=>{
+    const open=button.getAttribute('aria-expanded')==='true';
+    button.setAttribute('aria-expanded',String(!open));
+    button.setAttribute('aria-label',open?'Open menu':'Close menu');
+    menu.classList.toggle('open',!open);
+    menu.setAttribute('aria-hidden',String(open));
+    document.body.classList.toggle('menu-open',!open);
+  });
+  menu.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape') close()});
+})();
+</script>
+</body>
+</html>
