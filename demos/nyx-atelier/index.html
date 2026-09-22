@@ -259,34 +259,196 @@ body.hovering .cursor{
 .reveal{opacity:0;transform:translateY(50px);transition:opacity 1s var(--ease),transform 1s var(--ease)}
 .reveal.visible{opacity:1;transform:none}
 
-/* MOBILE */
-@media(max-width:850px){
-  body{cursor:auto}
-  .cursor,.cursor-dot{display:none}
-  .header{grid-template-columns:1fr auto;padding:20px 5vw}
-  .header-center{display:none}
-  .status{display:none}
-  .hero-copy{left:5vw;width:88vw}
-  .hero-title{font-size:clamp(65px,19vw,120px)}
-  .hud{display:none}
-  .section{padding:100px 6vw}
-  .story{grid-template-columns:1fr;gap:40px}
-  .story-visual{position:relative;top:auto;height:55vh}
-  .story-items{padding:0;gap:50px}
-  .story-item{min-height:45vh}
-  .cards-grid{grid-template-columns:1fr}
-  .card{min-height:500px}
-  .contact-bottom{flex-direction:column;align-items:flex-start}
-  .footer-grid{flex-direction:column;align-items:flex-start}
-}
-@media(prefers-reduced-motion:reduce){
-  *,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+/* =========================================================
+   NYX INTERACTIVE MENU & MOBILE NOTICE
+========================================================= */
+.mobile-notice {
+  display: none !important;
 }
 
+.nyx-menu-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  justify-content: flex-end;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .35s var(--ease), visibility .35s;
+}
+
+.nyx-menu-modal.open {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+}
+
+.nyx-menu-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 6, 6, .78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  cursor: pointer;
+}
+
+.nyx-menu-panel {
+  position: relative;
+  z-index: 2;
+  width: min(480px, 92vw);
+  height: 100svh;
+  background: #090909;
+  border-left: 1px solid #222;
+  padding: 36px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform: translateX(100%);
+  transition: transform .45s cubic-bezier(.22, 1, .36, 1);
+  box-shadow: -25px 0 60px rgba(0, 0, 0, .85);
+  overflow-y: auto;
+}
+
+.nyx-menu-modal.open .nyx-menu-panel {
+  transform: translateX(0);
+}
+
+.nyx-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #1a1a1a;
+  font: 12px "DM Mono", monospace;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #777;
+}
+
+.nyx-menu-brand span {
+  color: var(--acid);
+}
+
+.nyx-menu-close {
+  background: transparent;
+  border: 1px solid #444;
+  color: #fff;
+  padding: 8px 14px;
+  font: 11px "DM Mono", monospace;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: .25s ease;
+}
+
+.nyx-menu-close:hover {
+  background: var(--acid);
+  color: #050505;
+  border-color: var(--acid);
+}
+
+.nyx-menu-telemetry {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 0;
+  border-bottom: 1px solid #161616;
+  font: 10px "DM Mono", monospace;
+  letter-spacing: .14em;
+  color: #555;
+}
+
+.nyx-menu-links {
+  display: flex;
+  flex-direction: column;
+  margin: 18px 0;
+}
+
+.nyx-menu-link {
+  display: grid;
+  grid-template-columns: 32px 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid #161616;
+  text-decoration: none;
+  color: #f4f4f0;
+  transition: padding-left .25s var(--ease), color .2s ease;
+}
+
+.nyx-menu-link .num {
+  font: 12px "DM Mono", monospace;
+  color: var(--violet);
+  letter-spacing: .12em;
+}
+
+.nyx-menu-link .label {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(24px, 4.5vw, 32px);
+  font-weight: 500;
+  letter-spacing: -.04em;
+  line-height: 1;
+}
+
+.nyx-menu-link .arrow {
+  color: #555;
+  font-size: 16px;
+  transition: transform .25s ease, color .2s ease;
+}
+
+.nyx-menu-link:hover {
+  color: var(--acid);
+  padding-left: 8px;
+}
+
+.nyx-menu-link:hover .arrow {
+  color: var(--acid);
+  transform: translate(3px, -3px);
+}
+
+.nyx-menu-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 22px;
+  border-top: 1px solid #1a1a1a;
+  font: 11px "DM Mono", monospace;
+}
+
+.nyx-menu-footer small {
+  display: block;
+  color: #555;
+  letter-spacing: .14em;
+  margin-bottom: 5px;
+}
+
+.nyx-menu-back {
+  color: var(--acid);
+  text-decoration: none;
+  font-size: 12px;
+  letter-spacing: .1em;
+}
+
+.nyx-menu-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #777;
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+
+.nyx-menu-status i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--acid);
+  box-shadow: 0 0 10px var(--acid);
+}
 
 /* =========================================================
-   MOBILE RESPONSIVE PATCH — NYX ATELIER
-   Desktop visuals remain unchanged.
+   MOBILE RESPONSIVE — NYX ATELIER
 ========================================================= */
 @media (max-width: 850px){
   html,body{width:100%;max-width:100%;overflow-x:hidden}
@@ -294,60 +456,121 @@ body.hovering .cursor{
   .cursor,.cursor-dot{display:none!important}
   #webgl{opacity:.88}
 
+  /* HIGHLIGHT: Mobile notice ONLY in mobile view */
+  .mobile-notice {
+    display: flex !important;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 14px;
+    margin-bottom: 22px;
+    background: rgba(185, 255, 99, .06);
+    border: 1px solid rgba(185, 255, 99, .28);
+    border-radius: 8px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, .4);
+    position: relative;
+    z-index: 10;
+  }
+
+  .notice-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--acid);
+    font: 600 11px/1.2 "DM Mono", monospace;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .notice-badge i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--acid);
+    box-shadow: 0 0 10px var(--acid);
+    animation: pulse 1.8s infinite;
+  }
+
+  .notice-dash {
+    color: rgba(185, 255, 99, .75);
+    margin-left: 2px;
+  }
+
+  .notice-text {
+    color: #deded8;
+    font: 400 12.5px/1.5 "DM Sans", sans-serif;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
   .header{
-    height:72px!important;
+    height:64px!important;
     padding:0 18px!important;
+    grid-template-columns: 1fr auto !important;
   }
   .logo{font-size:18px!important}
   .header-center{display:none!important}
   .header-right{gap:10px!important}
-  .status{font-size:11px!important;letter-spacing:.1em!important}
-  .menu-btn{font-size:12px!important;padding:9px 13px!important}
+  .status{display:none!important}
+  .menu-btn{font-size:12px!important;padding:8px 14px!important;cursor:pointer!important;border-color:#555!important}
 
-  .hero{min-height:105svh!important;height:auto!important}
-  .hero-sticky{min-height:105svh!important;padding:96px 20px 28px!important}
-  .hero-ui{display:flex!important;justify-content:space-between!important;gap:18px!important;top:92px!important;left:20px!important;right:20px!important}
-  .hero-side{font-size:11px!important;line-height:1.35!important;max-width:140px!important}
-  .hero-side:nth-child(2){text-align:right}
-  .hero-copy{width:100%!important;max-width:none!important;margin-top:26px!important}
-  .hero-kicker{font-size:12px!important;letter-spacing:.15em!important;margin-bottom:22px!important}
-  .hero-title{font-size:clamp(54px,16vw,88px)!important;line-height:.82!important;letter-spacing:-.075em!important}
+  .hero{min-height:100svh!important;height:auto!important}
+  .hero-sticky{min-height:100svh!important;padding:80px 20px 65px!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
+  .hero-ui{display:none!important}
+  .hero-copy{width:100%!important;max-width:none!important;position:relative!important;top:auto!important;left:auto!important;transform:none!important;margin:0!important;padding:0!important;pointer-events:auto!important}
+  .hero-kicker{font-size:12px!important;letter-spacing:.15em!important;margin-bottom:18px!important}
+  .hero-title{font-size:clamp(46px,14.5vw,78px)!important;line-height:.84!important;letter-spacing:-.07em!important}
   .hero-title .line{display:block!important}
-  .hero-sub{width:min(100%,420px)!important;font-size:14px!important;line-height:1.55!important;margin-top:28px!important}
-  .hero-scroll{left:20px!important;bottom:28px!important;font-size:11px!important}
-  .hero-orbit-label{right:20px!important;bottom:28px!important;font-size:11px!important;writing-mode:vertical-rl!important}
-  .hud{right:18px!important;top:auto!important;bottom:84px!important;width:140px!important;transform:none!important}
-  .hud-row{font-size:11px!important;padding:7px 0!important}
+  .hero-sub{width:100%!important;max-width:440px!important;font-size:14px!important;line-height:1.6!important;margin-top:20px!important}
+  .hero-scroll{left:20px!important;bottom:24px!important;font-size:11px!important}
+  .hero-orbit-label{right:20px!important;bottom:24px!important;font-size:11px!important;writing-mode:horizontal-tb!important;transform:none!important}
+  .hud{display:none!important}
 
-  .section{padding:100px 20px!important}
+  .nyx-menu-panel {
+    width: 100vw;
+    padding: 28px 20px 24px;
+  }
+
+  .nyx-menu-link .label {
+    font-size: 26px;
+  }
+
+  .nyx-menu-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .section{padding:85px 20px!important}
   .section-inner{width:100%!important}
   .eyebrow{font-size:12px!important;letter-spacing:.14em!important}
-  .big-title{font-size:clamp(38px,11vw,62px)!important;line-height:.92!important;letter-spacing:-.055em!important;margin-top:25px!important}
-  .story{grid-template-columns:1fr!important;gap:28px!important;margin-top:54px!important}
-  .story-visual{min-height:58svh!important;height:58svh!important}
+  .big-title{font-size:clamp(38px,11vw,62px)!important;line-height:.92!important;letter-spacing:-.055em!important;margin-top:22px!important}
+  .story{grid-template-columns:1fr!important;gap:28px!important;margin-top:45px!important}
+  .story-visual{min-height:55svh!important;height:55svh!important}
   .story-items{gap:0!important}
-  .story-item{padding:28px 0!important}
+  .story-item{padding:26px 0!important}
   .story-item h3{font-size:26px!important;line-height:1!important;margin:12px 0!important}
   .story-item p{font-size:14px!important;line-height:1.6!important;max-width:430px!important}
   .story-num{font-size:12px!important}
 
-  .type-stage{min-height:72svh!important;height:72svh!important;padding:20px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;overflow:hidden!important}
-  .type-word{font-size:clamp(70px,23vw,150px)!important;line-height:.8!important;letter-spacing:-.09em!important;white-space:nowrap!important}
-  .type-caption{font-size:12px!important;letter-spacing:.12em!important;margin-top:24px!important;text-align:center!important}
+  .type-stage{min-height:65svh!important;height:65svh!important;padding:20px!important;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;overflow:hidden!important}
+  .type-word{font-size:clamp(65px,22vw,140px)!important;line-height:.8!important;letter-spacing:-.09em!important;white-space:nowrap!important}
+  .type-caption{font-size:12px!important;letter-spacing:.12em!important;margin-top:22px!important;text-align:center!important}
 
-  .cards-section{padding-top:100px!important}
-  .cards-grid{grid-template-columns:1fr!important;gap:14px!important;margin-top:46px!important}
-  .card{min-height:62svh!important;height:auto!important}
+  .cards-section{padding-top:85px!important}
+  .cards-grid{grid-template-columns:1fr!important;gap:14px!important;margin-top:40px!important}
+  .card{min-height:58svh!important;height:auto!important}
   .card-top{font-size:11px!important;padding:18px!important}
   .card-bottom{padding:22px!important}
-  .card-bottom h3{font-size:42px!important}
+  .card-bottom h3{font-size:38px!important}
   .card-bottom p{font-size:14px!important;line-height:1.55!important;max-width:300px!important}
 
-  .contact{padding:105px 20px 80px!important;min-height:auto!important}
-  .contact-title{font-size:clamp(54px,16vw,92px)!important;line-height:.84!important;letter-spacing:-.075em!important}
-  .contact-bottom{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:30px!important;margin-top:48px!important}
+  .contact{padding:90px 20px 75px!important;min-height:auto!important}
+  .contact-title{font-size:clamp(48px,15vw,85px)!important;line-height:.84!important;letter-spacing:-.075em!important}
+  .contact-bottom{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:26px!important;margin-top:40px!important}
   .contact-copy{font-size:14px!important;line-height:1.6!important;max-width:430px!important}
-  .contact-button{width:100%!important;min-height:56px!important;justify-content:space-between!important;padding:0 18px!important}
+  .contact-button{width:100%!important;min-height:52px!important;justify-content:space-between!important;padding:0 18px!important}
 
   .footer{padding:28px 20px!important}
   .footer-grid{grid-template-columns:1fr!important;gap:10px!important}
@@ -356,29 +579,25 @@ body.hovering .cursor{
 
 @media (max-width: 480px){
   .header{padding:0 14px!important}
-  .status{display:none!important}
   .hero-sticky{padding-left:16px!important;padding-right:16px!important}
-  .hero-ui{left:16px!important;right:16px!important}
-  .hero-title{font-size:clamp(50px,16.8vw,76px)!important}
-  .hero-sub{font-size:13px!important}
+  .hero-title{font-size:clamp(42px,15vw,68px)!important}
+  .hero-sub{font-size:13.5px!important}
   .hero-scroll{left:16px!important}
   .hero-orbit-label{right:16px!important}
-  .hud{right:14px!important;width:130px!important}
   .section,.contact{padding-left:16px!important;padding-right:16px!important}
-  .story-visual{min-height:52svh!important;height:52svh!important}
-  .type-stage{min-height:62svh!important;height:62svh!important}
-  .type-word{font-size:24vw!important}
-  .card{min-height:55svh!important}
+  .story-visual{min-height:50svh!important;height:50svh!important}
+  .type-stage{min-height:58svh!important;height:58svh!important}
+  .type-word{font-size:22vw!important}
+  .card{min-height:52svh!important}
 }
 
 @media (max-width: 360px){
   .logo{font-size:16px!important}
-  .menu-btn{font-size:11px!important;padding:8px 10px!important}
-  .hero-title{font-size:15.8vw!important}
+  .menu-btn{font-size:11px!important;padding:7px 10px!important}
+  .hero-title{font-size:14.5vw!important}
   .hero-sub{font-size:13px!important}
-  .hud{display:none!important}
-  .type-word{font-size:23vw!important}
-  .contact-title{font-size:15.5vw!important}
+  .type-word{font-size:21vw!important}
+  .contact-title{font-size:14vw!important}
 }
 
 @media (hover:none),(pointer:coarse){
@@ -424,6 +643,53 @@ body.hovering .cursor{
   </div>
 </header>
 
+<!-- INTERACTIVE MENU MODAL -->
+<div class="nyx-menu-modal" id="nyxMenu" aria-hidden="true" role="dialog" aria-label="NYX Navigation">
+  <div class="nyx-menu-backdrop"></div>
+  <div class="nyx-menu-panel">
+    <div class="nyx-menu-header">
+      <div class="nyx-menu-brand">NYX<span>®</span> / NAVIGATION</div>
+      <button class="nyx-menu-close" id="nyxMenuClose" type="button" aria-label="Close menu">Close / ✕</button>
+    </div>
+    <div class="nyx-menu-telemetry">
+      <span>SYSTEM // ONLINE</span>
+      <span>NODE // ATELIER-01</span>
+      <span>RENDER // WEBGL 3D</span>
+    </div>
+    <nav class="nyx-menu-links">
+      <a href="#top" class="nyx-menu-link">
+        <span class="num">01</span>
+        <span class="label">Overview</span>
+        <span class="arrow">↗</span>
+      </a>
+      <a href="#manifesto" class="nyx-menu-link">
+        <span class="num">02</span>
+        <span class="label">Manifesto</span>
+        <span class="arrow">↗</span>
+      </a>
+      <a href="#work" class="nyx-menu-link">
+        <span class="num">03</span>
+        <span class="label">Experiments</span>
+        <span class="arrow">↗</span>
+      </a>
+      <a href="#contact" class="nyx-menu-link">
+        <span class="num">04</span>
+        <span class="label">Enter Atelier</span>
+        <span class="arrow">↗</span>
+      </a>
+    </nav>
+    <div class="nyx-menu-footer">
+      <div>
+        <small>RETURN</small>
+        <a href="../../index.html" class="nyx-menu-back">← WebCraft Studio</a>
+      </div>
+      <div class="nyx-menu-status">
+        <i></i> SYSTEM READY
+      </div>
+    </div>
+  </div>
+</div>
+
 <main id="top">
 
 <section class="hero">
@@ -434,6 +700,12 @@ body.hovering .cursor{
     </div>
 
     <div class="hero-copy">
+      <!-- MOBILE HIGHLIGHT NOTICE: only visible on mobile -->
+      <div class="mobile-notice" role="note" aria-label="Desktop recommendation">
+        <div class="notice-badge"><i></i> DESKTOP EXPERIENCE <span class="notice-dash">—</span></div>
+        <div class="notice-text">Best viewed on Windows or macOS for the full 3D and animation experience.</div>
+      </div>
+
       <div class="hero-kicker reveal visible">Interactive digital matter</div>
       <h1 class="hero-title">
         <span class="line reveal visible">Beyond</span>
@@ -901,9 +1173,57 @@ body.hovering .cursor{
     });
   });
 
-  // ---------- MENU DEMO ----------
-  document.querySelector(".menu-btn").addEventListener("click",()=>{
-    alert("NYX navigation — concept interaction.");
+  // ---------- INTERACTIVE MENU ----------
+  const menuModal = document.getElementById("nyxMenu");
+  const menuBtn = document.querySelector(".menu-btn");
+  const menuClose = document.getElementById("nyxMenuClose");
+  const menuBackdrop = document.querySelector(".nyx-menu-backdrop");
+
+  const toggleMenu = (open) => {
+    if (!menuModal) return;
+    const shouldOpen = typeof open === "boolean" ? open : !menuModal.classList.contains("open");
+    menuModal.classList.toggle("open", shouldOpen);
+    menuModal.setAttribute("aria-hidden", String(!shouldOpen));
+    document.body.classList.toggle("menu-open", shouldOpen);
+    if (menuBtn) {
+      menuBtn.textContent = shouldOpen ? "Close / ✕" : "Menu / +";
+    }
+  };
+
+  if (menuBtn) {
+    menuBtn.addEventListener("click", () => toggleMenu());
+  }
+  if (menuClose) {
+    menuClose.addEventListener("click", () => toggleMenu(false));
+  }
+  if (menuBackdrop) {
+    menuBackdrop.addEventListener("click", () => toggleMenu(false));
+  }
+
+  // Close on Escape key
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && menuModal && menuModal.classList.contains("open")) {
+      toggleMenu(false);
+    }
+  });
+
+  // Close menu and smooth scroll when clicking menu links
+  document.querySelectorAll(".nyx-menu-link").forEach((link) => {
+    link.addEventListener("click", (e) => {
+      const targetId = link.getAttribute("href");
+      if (!targetId || targetId === "#") return;
+      const target = document.querySelector(targetId);
+      if (!target) return;
+      e.preventDefault();
+      toggleMenu(false);
+      setTimeout(() => {
+        if (typeof lenis !== "undefined" && lenis) {
+          lenis.scrollTo(target, { offset: 0 });
+        } else {
+          target.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 150);
+    });
   });
 })();
 </script>
